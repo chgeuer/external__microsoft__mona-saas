@@ -33,5 +33,7 @@ namespace Mona.SaaS.Core.Models.Configuration
         /// </summary>
         [Required]
         public string AadPrincipalId { get; set; }
+
+        public string ManagedIdentityAppId { get; set; }
     }
 }

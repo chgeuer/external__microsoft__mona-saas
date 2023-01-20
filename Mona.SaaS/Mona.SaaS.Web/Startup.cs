@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -100,9 +102,29 @@ namespace Mona.SaaS.Web
             services.Configure<DeploymentConfiguration>(this.Configuration.GetSection("Deployment"));
             services.Configure<IdentityConfiguration>(this.Configuration.GetSection("Identity"));
             services.Configure<EventGridSubscriptionEventPublisher.Configuration>(this.Configuration.GetSection("Subscriptions:Events:EventGrid"));
-            services.Configure<BlobStorageSubscriptionTestingCache.Configuration>(this.Configuration.GetSection("Subscriptions:Testing:Cache:BlobStorage"));
+            //services.Configure<BlobStorageSubscriptionTestingCache.Configuration>(this.Configuration.GetSection("Subscriptions:Testing:Cache:BlobStorage"));
+            //services.Configure<BlobStorageSubscriptionStagingCache.Configuration>(this.Configuration.GetSection("Subscriptions:Staging:Cache:BlobStorage"));
+            //services.Configure<BlobStoragePublisherConfigurationStore.Configuration>(this.Configuration.GetSection("PublisherConfig:Store:BlobStorage"));
+
+            var subscriptionTestingConfig = this.Configuration.GetSection("Subscriptions:Testing:Cache:BlobStorage");
+            services.Configure<BlobStorageSubscriptionTestingCache.Configuration>(subscriptionTestingConfig);
+
+            var subscriptionStagingConfig = this.Configuration.GetSection("Subscriptions:Staging:Cache:BlobStorage");
             services.Configure<BlobStorageSubscriptionStagingCache.Configuration>(this.Configuration.GetSection("Subscriptions:Staging:Cache:BlobStorage"));
-            services.Configure<BlobStoragePublisherConfigurationStore.Configuration>(this.Configuration.GetSection("PublisherConfig:Store:BlobStorage"));
+
+            var publisherConfig = this.Configuration.GetSection("PublisherConfig:Store:BlobStorage");
+            services.Configure<BlobStoragePublisherConfigurationStore.Configuration>(config: publisherConfig);
+
+            services.AddAzureClients(clientBuilder =>
+            {
+                // https://learn.microsoft.com/en-us/dotnet/azure/sdk/dependency-injection
+                var identityConfiguration = (IdentityConfiguration)this.Configuration.GetSection("Identity");
+                clientBuilder.UseCredential(new ManagedIdentityCredential(clientId: identityConfiguration.AppIdentity.ManagedIdentityAppId));
+
+                clientBuilder.AddBlobServiceClient(serviceUri: new Uri(subscriptionTestingConfig.Get<BlobStorageSubscriptionTestingCache.Configuration>().ServiceUri)).WithName(BlobStorageSubscriptionTestingCache.BlobServiceClientName);
+                clientBuilder.AddBlobServiceClient(serviceUri: new Uri(subscriptionStagingConfig.Get<BlobStorageSubscriptionStagingCache.Configuration>().ServiceUri)).WithName(BlobStorageSubscriptionStagingCache.BlobServiceClientName);
+                clientBuilder.AddBlobServiceClient(serviceUri: new Uri(publisherConfig.Get<BlobStoragePublisherConfigurationStore.Configuration>().ServiceUri)).WithName(BlobStoragePublisherConfigurationStore.BlobServiceClientName);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

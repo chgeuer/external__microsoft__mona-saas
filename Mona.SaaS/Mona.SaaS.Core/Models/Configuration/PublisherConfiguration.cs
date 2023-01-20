@@ -47,7 +47,7 @@ namespace Mona.SaaS.Core.Models.Configuration
         /// Gets/sets the URL of the page that users should be redirected to to configure an existing subscription.
         /// </summary>
         /// <remarks>
-        /// Note that you can use [<see cref="ConfigurationFields.SubscriptionId"/>] 
+        /// Note that you can use [<see cref="ConfigurationFields.SubscriptionId"/>]
         /// here to automatically merge the applicable subscription ID (e.g., <c>"https://microsoft.com/{subscription-id}/mona/..."</c>).
         /// </remarks>
         [Required, Display(Name = "SaaS offer configuration URL")]
@@ -57,7 +57,7 @@ namespace Mona.SaaS.Core.Models.Configuration
         /// Gets/sets the URL of the page that users should be redirected to once their subscription purchase is complete.
         /// </summary>
         /// <remarks>
-        /// Note that you can use [<see cref="ConfigurationFields.SubscriptionId"/>] 
+        /// Note that you can use [<see cref="ConfigurationFields.SubscriptionId"/>]
         /// here to automatically merge the applicable subscription ID (e.g., <c>"https://microsoft.com/{subscription-id}/mona/..."</c>).
         /// </remarks>
         [Required, Display(Name = "SaaS offer purchase confirmation URL")]

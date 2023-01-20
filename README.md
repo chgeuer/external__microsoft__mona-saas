@@ -9,11 +9,11 @@
  ## How does Mona SaaS work?
 
  Mona SaaS implements all of the various customer and publisher (you, the ISV) flows that are required by Microsoft's [SaaS fulfillment APIs](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2) including both [the landing page](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#purchased-but-not-yet-activated-pendingfulfillmentstart) that customers will see when purchasing your SaaS offer and [the webhook](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#implementing-a-webhook-on-the-saas-service) that Azure Marketplace uses to notify you of [subscription changes](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#managing-the-saas-subscription-life-cycle) like [cancellations](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#canceled-unsubscribed) and [suspensions](https://docs.microsoft.com/azure/marketplace/partner-center-portal/pc-saas-fulfillment-api-v2#suspended-suspended).
- 
+
   ![Mona Architecture Overview](docs/images/mona_arch_overview.png)
- 
+
 Each of these operations is exposed to your SaaS application by Mona SaaS through events published to [a custom Event Grid topic](https://docs.microsoft.com/azure/event-grid/custom-topics) automatically provisioned during setup. By default, Mona SaaS deploys a set of "stub" Logic Apps into your Azure subscription that are enabled by default and configured to be triggered by these subscription events.
- 
+
  Since Mona SaaS exposes these subscription-related events to your SaaS application through an Event Grid topic, [you have lots of options for handling them](https://docs.microsoft.com/azure/event-grid/overview#event-handlers). Because Mona SaaS is using Event Grid, multiple event subscribers can handle the same events simultaneously. These flows can be easily modified in production with no downtime.
 
 ## How do I get started with Mona SaaS?
@@ -29,7 +29,7 @@ First, ensure that the following prerequisites are met.
  ### 2. Clone the Mona SaaS GitHub repository
 
  Navigate to [the Azure portal](https://portal.azure.com) and [launch the Bash cloud shell](https://docs.microsoft.com/azure/cloud-shell/quickstart#start-cloud-shell).
- 
+
  > If this is the first time that you've used the cloud shell, you will be prompted to [create or choose an existing an Azure Files share](https://docs.microsoft.com/azure/cloud-shell/overview#connect-your-microsoft-azure-files-storage).
 
 Run this command from the cloud shell to clone the Mona SaaS repository —
@@ -42,12 +42,6 @@ By default, the Mona SaaS repository will be cloned to a local directory named `
 
 ```shell
 cd ./mona-saas/Mona.SaaS/Mona.SaaS.Setup
-```
-
-Finally, enable the setup script to be executed locally by running —
-
-```shell
-chmod +x ./basic-deploy.sh
 ```
 
 ### 3. Set up Mona SaaS

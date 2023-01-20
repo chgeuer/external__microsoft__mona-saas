@@ -5,6 +5,7 @@ namespace Mona.SaaS.Services.Default
 {
     using Azure.Storage.Blobs;
     using Azure.Storage.Blobs.Models;
+    using Microsoft.Extensions.Azure;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Mona.SaaS.Core.Interfaces;
@@ -18,6 +19,7 @@ namespace Mona.SaaS.Services.Default
 
     public class BlobStoragePublisherConfigurationStore : IPublisherConfigurationStore
     {
+        public static readonly string BlobServiceClientName = "PublisherConfiguration";
         public const string ConfigurationBlobName = "publisher-config.json";
 
         private readonly Configuration config;
@@ -25,12 +27,12 @@ namespace Mona.SaaS.Services.Default
         private readonly ILogger logger;
 
         public BlobStoragePublisherConfigurationStore(
+            IAzureClientFactory<BlobServiceClient> clientFactory,
             IOptionsSnapshot<Configuration> configSnapshot,
             ILogger<BlobStoragePublisherConfigurationStore> logger)
         {
             this.config = configSnapshot.Value;
-
-            var serviceClient = new BlobServiceClient(this.config.ConnectionString);
+            var serviceClient = clientFactory.CreateClient(BlobServiceClientName);
 
             this.containerClient = serviceClient.GetBlobContainerClient(config.ContainerName);
             this.logger = logger;
@@ -104,7 +106,7 @@ namespace Mona.SaaS.Services.Default
         public class Configuration
         {
             [Required]
-            public string ConnectionString { get; set; }
+            public string ServiceUri { get; set; }
 
             public string ContainerName { get; set; } = "configuration";
         }

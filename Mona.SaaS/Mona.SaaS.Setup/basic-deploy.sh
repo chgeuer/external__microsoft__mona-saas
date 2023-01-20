@@ -7,7 +7,7 @@ mona_version=$(cat ../../VERSION)
 
 exec 3>&2 # Grabbing a reliable stderr handle...
 
-usage() { printf "\nUsage: $0 <-n deployment-name> <-r deployment-region> [-i integration-pack] [-a app-service-plan-id] [-d display-name] [-g resource-group] [-l ui-language] [-s subscription-id] [-e event-version] [-h] [-p]\n"; }
+usage() { printf "\nUsage: %s <-n deployment-name> <-r deployment-region> [-i integration-pack] [-a app-service-plan-id] [-d display-name] [-g resource-group] [-l ui-language] [-s subscription-id] [-e event-version] [-h] [-p]\n" $0;  }
 
 check_az() {
     exec 3>&2
@@ -282,6 +282,7 @@ create_mona_app_json="${create_mona_app_json/__admin_role_id__/${mona_admin_role
 
 for i1 in {1..5}; do
     create_mona_app_response=$(curl \
+        --no-progress-meter \
         -X POST \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $graph_token" \
@@ -314,6 +315,7 @@ add_mona_password_json=$(cat ./aad/add_password.json)
 
 for i2 in {1..5}; do
     add_mona_password_response=$(curl \
+        --no-progress-meter \
         -X POST \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $graph_token" \
@@ -386,7 +388,7 @@ az_deployment_name="mona-deploy-$deployment_name"
 az deployment group create \
     --resource-group "$resource_group_name" \
     --name "$az_deployment_name" \
-    --template-file "./templates/basic-deploy.json" \
+    --template-file "./templates/basic.bicep" \
     --parameters \
         deploymentName="$deployment_name" \
         aadTenantId="$current_user_tid" \
@@ -446,6 +448,7 @@ echo "$lp 🔐   Adding you to the Mona administrators role...";
 # Regardless of whether or not -j was set, add the current user to the admin role...
 
 curl -X POST \
+    --no-progress-meter \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $graph_token" \
     -d "{ \"principalId\": \"$current_user_oid\", \"resourceId\": \"$mona_aad_sp_id\", \"appRoleId\": \"$mona_admin_role_id\" }" \

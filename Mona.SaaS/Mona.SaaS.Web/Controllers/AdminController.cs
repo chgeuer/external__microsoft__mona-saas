@@ -109,11 +109,7 @@ namespace Mona.SaaS.Web.Controllers
         {
             var locale = CultureInfo.CurrentUICulture.Name;
 
-            var azCredentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
-                identityConfig.AppIdentity.AadClientId,
-                identityConfig.AppIdentity.AadClientSecret,
-                identityConfig.AppIdentity.AadTenantId,
-                AzureEnvironment.AzureGlobalCloud);
+            var azCredentials = identityConfig.AppIdentity.CreateInfrastructureToken();
 
             var logicAppInterrogator = new LogicAppPluginInterrogator();
 
